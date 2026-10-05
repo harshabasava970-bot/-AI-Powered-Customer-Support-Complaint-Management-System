@@ -6,13 +6,17 @@ services:
     branch: main
     dockerfilePath: ./Dockerfile
     envVars:
-      - key: DB_URL
-        value: jdbc:mysql://mysql-3bfe215c-harshabasava970-2b90.b.aivencloud.com:14858/defaultdb?sslMode=REQUIRED&allowPublicKeyRetrieval=true&serverTimezone=UTC&connectTimeout=60000&socketTimeout=60000
-      - key: DB_USERNAME
-        value: avnadmin
-      - key: DB_PASSWORD
-        sync: false
       - key: PORT
         value: "8080"
+      - key: DB_URL
+        value: jdbc:h2:mem:supportdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - key: DB_USERNAME
+        value: sa
+      - key: DB_PASSWORD
+        value: ""
+      - key: DB_DRIVER
+        value: org.h2.Driver
+      - key: DB_DIALECT
+        value: org.hibernate.dialect.H2Dialect
     healthCheckPath: /login
     autoDeploy: true
