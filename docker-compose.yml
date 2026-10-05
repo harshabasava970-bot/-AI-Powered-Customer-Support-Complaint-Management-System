@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: support_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: support_db
+      MYSQL_USER: ${DB_USERNAME:-supportuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-supportpass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: support_app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/support_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: ${DB_USERNAME:-supportuser}
+      DB_PASSWORD: ${DB_PASSWORD:-supportpass}
+      PORT: 8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Categories — Admin</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="app-wrapper">
+  <div th:replace="~{fragments/layout :: sidebar('categories')}"></div>
+  <div class="main-content">
+    <div th:replace="~{fragments/layout :: topbar('Complaint Categories')}"></div>
+    <div class="page-body">
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+      <div class="page-header"><h1>Complaint Categories</h1></div>
+
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start">
+        <div class="card">
+          <div class="card-header"><h3>All Categories</h3></div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>Name</th><th>Description</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr th:each="c : ${categories}">
+                  <td><strong th:text="${c.name}"></strong></td>
+                  <td th:text="${c.description}"></td>
+                  <td>
+                    <span th:if="${c.active}"  class="badge badge-resolved">Active</span>
+                    <span th:unless="${c.active}" class="badge badge-closed">Inactive</span>
+                  </td>
+                  <td>
+                    <form th:action="@{/admin/categories/{id}/toggle(id=${c.id})}"
+                          method="post" style="display:inline">
+                      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                      <button type="submit"
+                              th:class="${c.active ? 'btn btn-sm btn-warning' : 'btn btn-sm btn-success'}"
+                              th:text="${c.active ? 'Deactivate' : 'Activate'}"></button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Add Category</h3></div>
+          <div class="card-body">
+            <form th:action="@{/admin/categories}" method="post" th:object="${categoryDto}">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input th:field="*{name}" type="text" class="form-control"
+                       th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''"
+                       placeholder="e.g. Returns"/>
+                <div class="invalid-feedback" th:errors="*{name}"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea th:field="*{description}" class="form-control" rows="3"
+                          placeholder="Brief description..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+                Add Category
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

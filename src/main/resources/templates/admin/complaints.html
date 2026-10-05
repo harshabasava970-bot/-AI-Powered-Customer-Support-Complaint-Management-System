@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>All Complaints — Admin</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="app-wrapper">
+  <div th:replace="~{fragments/layout :: sidebar('complaints')}"></div>
+  <div class="main-content">
+    <div th:replace="~{fragments/layout :: topbar('All Complaints')}"></div>
+    <div class="page-body">
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+      <div class="page-header"><h1>All Complaints</h1></div>
+
+      <!-- Filters -->
+      <form th:action="@{/admin/complaints}" method="get" th:object="${search}" class="filter-bar">
+        <div class="form-group">
+          <label class="form-label">Search</label>
+          <input th:field="*{keyword}" type="text" class="form-control" placeholder="Title keyword..."/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select th:field="*{status}" class="form-control">
+            <option value="">All</option>
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select th:field="*{priority}" class="form-control">
+            <option value="">All</option>
+            <option th:each="p : ${priorities}" th:value="${p}" th:text="${p}"></option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select th:field="*{categoryId}" class="form-control">
+            <option value="">All</option>
+            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Agent</label>
+          <select th:field="*{agentId}" class="form-control">
+            <option value="">All</option>
+            <option th:each="a : ${agents}" th:value="${a.id}" th:text="${a.fullName}"></option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">From</label>
+          <input th:field="*{fromDate}" type="date" class="form-control"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">To</label>
+          <input th:field="*{toDate}" type="date" class="form-control"/>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:flex-end;padding-bottom:1rem">
+          <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+          <a th:href="@{/admin/complaints}" class="btn btn-secondary btn-sm">Reset</a>
+        </div>
+      </form>
+
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <div th:if="${complaintsPage.totalElements == 0}"
+               style="padding:2rem;text-align:center;color:#64748b">No complaints found.</div>
+          <div class="table-wrap" th:unless="${complaintsPage.totalElements == 0}">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Title</th><th>Customer</th><th>Category</th>
+                    <th>Priority</th><th>Status</th><th>Agent</th><th>Date</th><th></th></tr>
+              </thead>
+              <tbody>
+                <tr th:each="c : ${complaintsPage.content}">
+                  <td th:text="${c.id}"></td>
+                  <td><strong th:text="${c.title}"></strong></td>
+                  <td th:text="${c.customerName}"></td>
+                  <td th:text="${c.categoryName}"></td>
+                  <td><span th:replace="~{fragments/layout :: priorityBadge(${c.priority})}"></span></td>
+                  <td><span th:replace="~{fragments/layout :: statusBadge(${c.status})}"></span></td>
+                  <td th:text="${c.assignedAgentName != null ? c.assignedAgentName : '—'}"></td>
+                  <td th:text="${#temporals.format(c.createdAt,'dd MMM yyyy')}"></td>
+                  <td><a th:href="@{/admin/complaints/{id}(id=${c.id})}" class="btn btn-sm btn-outline">Manage</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span style="font-size:.8rem;color:#64748b"
+                th:text="${'Showing ' + complaintsPage.numberOfElements + ' of ' + complaintsPage.totalElements + ' complaints'}"></span>
+          <div class="pagination" th:if="${complaintsPage.totalPages > 1}">
+            <a th:if="${complaintsPage.number > 0}"
+               th:href="@{/admin/complaints(page=${complaintsPage.number - 1})}">‹</a>
+            <span th:each="i : ${#numbers.sequence(0, complaintsPage.totalPages - 1)}"
+                  th:classappend="${i == complaintsPage.number} ? 'active' : ''">
+              <a th:href="@{/admin/complaints(page=${i})}" th:text="${i+1}"></a>
+            </span>
+            <a th:if="${complaintsPage.number < complaintsPage.totalPages - 1}"
+               th:href="@{/admin/complaints(page=${complaintsPage.number + 1})}">›</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

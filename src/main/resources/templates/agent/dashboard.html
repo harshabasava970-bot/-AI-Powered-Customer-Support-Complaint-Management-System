@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Agent Dashboard — SupportPortal</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="app-wrapper">
+  <div th:replace="~{fragments/layout :: sidebar('dashboard')}"></div>
+  <div class="main-content">
+    <div th:replace="~{fragments/layout :: topbar('Agent Dashboard')}"></div>
+    <div class="page-body">
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <div class="page-header">
+        <div>
+          <h1>Welcome, <span th:text="${user.firstName}">Agent</span>!</h1>
+          <p style="color:#64748b;font-size:.875rem">Your support performance overview.</p>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" th:if="${agentStats != null}">
+        <div class="stat-card primary">
+          <div class="stat-label">Total Assigned</div>
+          <div class="stat-value" th:text="${agentStats.totalAssigned}">0</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-value" th:text="${agentStats.inProgress}">0</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">Resolved</div>
+          <div class="stat-value" th:text="${agentStats.resolved}">0</div>
+        </div>
+        <div class="stat-card info">
+          <div class="stat-label">Avg Rating</div>
+          <div class="stat-value" th:text="${agentStats.averageRating != null ? agentStats.averageRating : 'N/A'}">—</div>
+          <div class="stat-sub" th:text="${agentStats.feedbackCount + ' reviews'}"></div>
+        </div>
+      </div>
+
+      <!-- Recent assigned complaints -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Recently Assigned</h3>
+          <a th:href="@{/agent/complaints}" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div th:if="${#lists.isEmpty(recentComplaints)}"
+               style="padding:2rem;text-align:center;color:#64748b">
+            No complaints assigned to you yet.
+          </div>
+          <div class="table-wrap" th:unless="${#lists.isEmpty(recentComplaints)}">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Title</th><th>Customer</th><th>Priority</th><th>Status</th><th>Date</th><th></th></tr>
+              </thead>
+              <tbody>
+                <tr th:each="c : ${recentComplaints}">
+                  <td th:text="${c.id}"></td>
+                  <td th:text="${c.title}"></td>
+                  <td th:text="${c.customerName}"></td>
+                  <td><span th:replace="~{fragments/layout :: priorityBadge(${c.priority})}"></span></td>
+                  <td><span th:replace="~{fragments/layout :: statusBadge(${c.status})}"></span></td>
+                  <td th:text="${#temporals.format(c.createdAt,'dd MMM yyyy')}"></td>
+                  <td><a th:href="@{/agent/complaints/{id}(id=${c.id})}" class="btn btn-sm btn-outline">Work</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>AI Support Portal</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="home-hero">
+  <nav class="home-nav">
+    <div class="brand">🎧 SupportPortal <strong>AI</strong></div>
+    <div class="nav-links">
+      <a th:href="@{/login}">Login</a>
+      <a th:href="@{/register}" class="btn btn-primary btn-sm">Register</a>
+    </div>
+  </nav>
+
+  <div class="hero-content">
+    <h1>Smarter Customer Support<br>Powered by AI</h1>
+    <p>Submit complaints, get instant AI-driven category &amp; priority predictions, and track every update in real time.</p>
+    <div class="hero-cta">
+      <a th:href="@{/register}" class="btn btn-primary btn-lg">Get Started Free</a>
+      <a th:href="@{/login}"    class="btn btn-outline btn-lg" style="border-color:#fff;color:#fff">Sign In</a>
+    </div>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="icon">🤖</div>
+      <h3>AI Classification</h3>
+      <p>Rule-based NLP automatically predicts the category and priority of every complaint.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⚡</div>
+      <h3>Fast Assignment</h3>
+      <p>Admins can assign complaints to the right support agent instantly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔄</div>
+      <h3>Status Tracking</h3>
+      <p>Full lifecycle from NEW → ASSIGNED → IN_PROGRESS → RESOLVED → CLOSED.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⭐</div>
+      <h3>Feedback Loop</h3>
+      <p>Customers rate their experience after resolution. Admins see satisfaction trends.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔐</div>
+      <h3>Role-Based Access</h3>
+      <p>Three distinct roles — Customer, Agent, Admin — each with secure access controls.</p>
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

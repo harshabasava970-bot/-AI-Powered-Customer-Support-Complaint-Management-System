@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Manage Complaint — Admin</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="app-wrapper">
+  <div th:replace="~{fragments/layout :: sidebar('complaints')}"></div>
+  <div class="main-content">
+    <div th:replace="~{fragments/layout :: topbar('Manage Complaint')}"></div>
+    <div class="page-body">
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <div class="page-header">
+        <div>
+          <div class="breadcrumb">
+            <a th:href="@{/admin/complaints}">Complaints</a> ›
+            <span th:text="'#' + ${complaint.id}"></span>
+          </div>
+          <h1 th:text="${complaint.title}"></h1>
+        </div>
+        <div style="display:flex;gap:.5rem">
+          <span th:replace="~{fragments/layout :: statusBadge(${complaint.status})}"></span>
+          <span th:replace="~{fragments/layout :: priorityBadge(${complaint.priority})}"></span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start">
+        <div style="display:flex;flex-direction:column;gap:1rem">
+
+          <!-- Info -->
+          <div class="card">
+            <div class="card-header"><h3>Complaint Information</h3></div>
+            <div class="card-body">
+              <dl style="display:grid;grid-template-columns:150px 1fr;gap:.5rem .75rem;font-size:.875rem">
+                <dt style="color:#64748b;font-weight:600">Customer</dt>
+                <dd th:text="${complaint.customerName + ' — ' + complaint.customerEmail}"></dd>
+                <dt style="color:#64748b;font-weight:600">Category</dt>
+                <dd th:text="${complaint.categoryName}"></dd>
+                <dt style="color:#64748b;font-weight:600">Agent</dt>
+                <dd th:text="${complaint.assignedAgentName != null ? complaint.assignedAgentName : 'Unassigned'}"></dd>
+                <dt style="color:#64748b;font-weight:600">Created</dt>
+                <dd th:text="${#temporals.format(complaint.createdAt,'dd MMM yyyy, HH:mm')}"></dd>
+                <dt style="color:#64748b;font-weight:600">Updated</dt>
+                <dd th:text="${#temporals.format(complaint.updatedAt,'dd MMM yyyy, HH:mm')}"></dd>
+              </dl>
+              <hr style="margin:1rem 0"/>
+              <p style="font-size:.875rem;white-space:pre-wrap" th:text="${complaint.description}"></p>
+              <th:block th:if="${complaint.additionalInfo != null}">
+                <h4 style="font-size:.85rem;font-weight:600;margin:.75rem 0 .4rem">Customer Update</h4>
+                <p style="font-size:.875rem;white-space:pre-wrap" th:text="${complaint.additionalInfo}"></p>
+              </th:block>
+            </div>
+          </div>
+
+          <!-- Assign Agent -->
+          <div class="card">
+            <div class="card-header"><h3>Assign / Reassign Agent</h3></div>
+            <div class="card-body">
+              <form th:action="@{/admin/complaints/{id}/assign(id=${complaint.id})}"
+                    method="post" th:object="${assignRequest}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div style="display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap">
+                  <div class="form-group" style="flex:1;min-width:180px;margin:0">
+                    <label class="form-label">Select Agent</label>
+                    <select th:field="*{agentId}" class="form-control">
+                      <option value="">— Select Agent —</option>
+                      <option th:each="a : ${agents}"
+                              th:value="${a.id}"
+                              th:text="${a.fullName}"
+                              th:selected="${complaint.assignedAgentId != null and complaint.assignedAgentId == a.id}"></option>
+                    </select>
+                    <div class="invalid-feedback" th:errors="*{agentId}"></div>
+                  </div>
+                  <div class="form-group" style="flex:2;min-width:200px;margin:0">
+                    <label class="form-label">Note (optional)</label>
+                    <input th:field="*{notes}" type="text" class="form-control" placeholder="Assignment note..."/>
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="margin-bottom:1rem">Assign</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Update Status -->
+          <div class="card">
+            <div class="card-header"><h3>Override Status</h3></div>
+            <div class="card-body">
+              <form th:action="@{/admin/complaints/{id}/status(id=${complaint.id})}"
+                    method="post" th:object="${statusRequest}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div style="display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap">
+                  <div class="form-group" style="flex:1;min-width:160px;margin:0">
+                    <label class="form-label">New Status</label>
+                    <select th:field="*{status}" class="form-control">
+                      <option value="">— Select —</option>
+                      <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="flex:2;min-width:200px;margin:0">
+                    <label class="form-label">Note</label>
+                    <input th:field="*{notes}" type="text" class="form-control" placeholder="Reason for override..."/>
+                  </div>
+                  <button type="submit" class="btn btn-warning" style="margin-bottom:1rem">Update</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right -->
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div class="ai-box" th:if="${complaint.aiAnalysisExplanation != null}">
+            <div class="ai-box-title">🤖 AI Analysis</div>
+            <div class="ai-predictions">
+              <div class="ai-pred-item">
+                <div class="ai-pred-label">Category</div>
+                <div class="ai-pred-value" th:text="${complaint.aiPredictedCategory}"></div>
+              </div>
+              <div class="ai-pred-item">
+                <div class="ai-pred-label">Priority</div>
+                <div class="ai-pred-value" th:text="${complaint.aiPredictedPriority}"></div>
+              </div>
+            </div>
+            <div class="ai-explanation" th:text="${complaint.aiAnalysisExplanation}"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><h3>Status Timeline</h3></div>
+            <div class="card-body">
+              <div class="timeline">
+                <div class="timeline-item" th:each="h : ${complaint.statusHistory}">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-meta"
+                       th:text="${#temporals.format(h.changedAt,'dd MMM, HH:mm') + ' — ' + h.changedByName}"></div>
+                  <div class="timeline-content">
+                    <span th:replace="~{fragments/layout :: statusBadge(${h.newStatus})}"></span>
+                    <span th:if="${h.notes != null}"
+                          style="font-size:.78rem;color:#64748b;display:block;margin-top:.2rem"
+                          th:text="${h.notes}"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" th:if="${complaint.feedback != null}">
+            <div class="card-header"><h3>Customer Feedback</h3></div>
+            <div class="card-body">
+              <div class="star-display"
+                   th:text="${'★'.repeat(complaint.feedback.rating) + '☆'.repeat(5 - complaint.feedback.rating)}"></div>
+              <p style="font-size:.875rem;margin-top:.5rem" th:text="${complaint.feedback.comment}"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

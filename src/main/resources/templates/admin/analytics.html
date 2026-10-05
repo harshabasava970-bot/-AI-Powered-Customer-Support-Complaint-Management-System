@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Analytics — Admin</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="app-wrapper">
+  <div th:replace="~{fragments/layout :: sidebar('analytics')}"></div>
+  <div class="main-content">
+    <div th:replace="~{fragments/layout :: topbar('Analytics')}"></div>
+    <div class="page-body">
+      <div class="page-header"><h1>Analytics &amp; Reports</h1></div>
+
+      <!-- Overview -->
+      <div class="stats-grid">
+        <div class="stat-card primary">
+          <div class="stat-label">Total</div>
+          <div class="stat-value" th:text="${stats.totalComplaints}">0</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">Resolved</div>
+          <div class="stat-value" th:text="${stats.resolvedComplaints}">0</div>
+        </div>
+        <div class="stat-card info">
+          <div class="stat-label">Closed</div>
+          <div class="stat-value" th:text="${stats.closedComplaints}">0</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">Avg Rating</div>
+          <div class="stat-value" th:text="${stats.averageRating != null ? stats.averageRating : 'N/A'}">—</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-label">Critical</div>
+          <div class="stat-value" th:text="${stats.criticalComplaints}">0</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+        <!-- By Category -->
+        <div class="card">
+          <div class="card-header"><h3>By Category</h3></div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>Category</th><th>Count</th><th>Bar</th></tr></thead>
+              <tbody>
+                <tr th:each="entry : ${stats.complaintsByCategory}">
+                  <td th:text="${entry.key}"></td>
+                  <td><strong th:text="${entry.value}"></strong></td>
+                  <td style="min-width:120px">
+                    <div style="background:#e2e8f0;border-radius:4px;height:10px">
+                      <div style="background:#2563eb;height:10px;border-radius:4px;transition:width .3s"
+                           th:style="'width:' + (${stats.totalComplaints > 0 ? entry.value * 100 / stats.totalComplaints : 0}) + '%'"></div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- By Status -->
+        <div class="card">
+          <div class="card-header"><h3>By Status</h3></div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>Status</th><th>Count</th><th>Bar</th></tr></thead>
+              <tbody>
+                <tr th:each="entry : ${stats.complaintsByStatus}">
+                  <td><span th:replace="~{fragments/layout :: statusBadge(${entry.key})}"></span></td>
+                  <td><strong th:text="${entry.value}"></strong></td>
+                  <td style="min-width:120px">
+                    <div style="background:#e2e8f0;border-radius:4px;height:10px">
+                      <div style="background:#16a34a;height:10px;border-radius:4px"
+                           th:style="'width:' + (${stats.totalComplaints > 0 ? entry.value * 100 / stats.totalComplaints : 0}) + '%'"></div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Performance -->
+      <div class="card">
+        <div class="card-header"><h3>Agent Performance</h3></div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Agent</th><th>Email</th><th>Total</th><th>In Progress</th>
+                    <th>Resolved</th><th>Closed</th><th>Avg Rating</th><th>Reviews</th></tr>
+              </thead>
+              <tbody>
+                <tr th:each="a : ${agentStats}">
+                  <td th:text="${a.agentName}"></td>
+                  <td th:text="${a.agentEmail}"></td>
+                  <td><strong th:text="${a.totalAssigned}"></strong></td>
+                  <td th:text="${a.inProgress}"></td>
+                  <td><span style="color:#16a34a;font-weight:600" th:text="${a.resolved}"></span></td>
+                  <td th:text="${a.closed}"></td>
+                  <td>
+                    <span th:if="${a.averageRating != null}"
+                          th:text="${a.averageRating + ' ★'}" style="color:#f59e0b;font-weight:600"></span>
+                    <span th:unless="${a.averageRating != null}">—</span>
+                  </td>
+                  <td th:text="${a.feedbackCount}"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

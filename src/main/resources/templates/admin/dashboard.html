@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Dashboard — SupportPortal</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="app-wrapper">
+  <div th:replace="~{fragments/layout :: sidebar('dashboard')}"></div>
+  <div class="main-content">
+    <div th:replace="~{fragments/layout :: topbar('Admin Dashboard')}"></div>
+    <div class="page-body">
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <a th:href="@{/admin/complaints}" class="btn btn-primary">View All Complaints</a>
+      </div>
+
+      <!-- Top stats -->
+      <div class="stats-grid">
+        <div class="stat-card primary">
+          <div class="stat-label">Total Complaints</div>
+          <div class="stat-value" th:text="${stats.totalComplaints}">0</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">New</div>
+          <div class="stat-value" th:text="${stats.newComplaints}">0</div>
+        </div>
+        <div class="stat-card info">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-value" th:text="${stats.inProgressComplaints}">0</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">Resolved</div>
+          <div class="stat-value" th:text="${stats.resolvedComplaints}">0</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-label">Critical</div>
+          <div class="stat-value" th:text="${stats.criticalComplaints}">0</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">High Priority</div>
+          <div class="stat-value" th:text="${stats.highComplaints}">0</div>
+        </div>
+        <div class="stat-card primary">
+          <div class="stat-label">Agents</div>
+          <div class="stat-value" th:text="${stats.totalAgents}">0</div>
+        </div>
+        <div class="stat-card info">
+          <div class="stat-label">Avg Rating</div>
+          <div class="stat-value" th:text="${stats.averageRating != null ? stats.averageRating : 'N/A'}">—</div>
+          <div class="stat-sub" th:text="${stats.totalFeedbackCount + ' reviews'}"></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+
+        <!-- By Category -->
+        <div class="card">
+          <div class="card-header"><h3>Complaints by Category</h3></div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>Category</th><th>Count</th><th>Share</th></tr></thead>
+              <tbody>
+                <tr th:each="entry : ${stats.complaintsByCategory}">
+                  <td th:text="${entry.key}"></td>
+                  <td><strong th:text="${entry.value}"></strong></td>
+                  <td>
+                    <div style="background:#e2e8f0;border-radius:4px;height:8px;min-width:80px">
+                      <div style="background:#2563eb;height:8px;border-radius:4px"
+                           th:style="'width:' + (${stats.totalComplaints > 0 ? entry.value * 100 / stats.totalComplaints : 0}) + '%'"></div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Agent Workload -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Agent Workload</h3>
+            <a th:href="@{/admin/agents}" class="btn btn-sm btn-outline">Details</a>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div th:if="${#maps.isEmpty(stats.agentWorkload)}"
+                 style="padding:1.5rem;text-align:center;color:#64748b">No complaints assigned yet.</div>
+            <table th:unless="${#maps.isEmpty(stats.agentWorkload)}">
+              <thead><tr><th>Agent</th><th>Assigned</th></tr></thead>
+              <tbody>
+                <tr th:each="entry : ${stats.agentWorkload}">
+                  <td th:text="${entry.key}"></td>
+                  <td><strong th:text="${entry.value}"></strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overdue Complaints -->
+      <div class="card" th:unless="${#lists.isEmpty(overdueComplaints)}">
+        <div class="card-header" style="border-left:4px solid #dc2626">
+          <h3 style="color:#dc2626">⚠️ Overdue Complaints (48h+)</h3>
+          <span class="badge badge-critical" th:text="${#lists.size(overdueComplaints)}"></span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Title</th><th>Customer</th><th>Priority</th><th>Status</th><th>Last Update</th><th></th></tr></thead>
+              <tbody>
+                <tr th:each="c : ${overdueComplaints}">
+                  <td th:text="${c.id}"></td>
+                  <td th:text="${c.title}"></td>
+                  <td th:text="${c.customerName}"></td>
+                  <td><span th:replace="~{fragments/layout :: priorityBadge(${c.priority})}"></span></td>
+                  <td><span th:replace="~{fragments/layout :: statusBadge(${c.status})}"></span></td>
+                  <td th:text="${#temporals.format(c.updatedAt,'dd MMM, HH:mm')}"></td>
+                  <td><a th:href="@{/admin/complaints/{id}(id=${c.id})}" class="btn btn-sm btn-danger">Action</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

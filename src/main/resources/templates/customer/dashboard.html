@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>My Dashboard — SupportPortal</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="app-wrapper">
+  <div th:replace="~{fragments/layout :: sidebar('dashboard')}"></div>
+  <div class="main-content">
+    <div th:replace="~{fragments/layout :: topbar('My Dashboard')}"></div>
+    <div class="page-body">
+      <div th:replace="~{fragments/layout :: alerts}"></div>
+
+      <div class="page-header">
+        <div>
+          <h1>Welcome, <span th:text="${user.firstName}">User</span>!</h1>
+          <p style="color:#64748b;font-size:.875rem">Here's a summary of your support activity.</p>
+        </div>
+        <a th:href="@{/customer/complaints/new}" class="btn btn-primary">➕ New Complaint</a>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card primary">
+          <div class="stat-label">Total Complaints</div>
+          <div class="stat-value" th:text="${totalComplaints}">0</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">Open</div>
+          <div class="stat-value" th:text="${openComplaints}">0</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Recent Complaints</h3>
+          <a th:href="@{/customer/complaints}" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div th:if="${#lists.isEmpty(complaints)}"
+               style="padding:2rem;text-align:center;color:#64748b">
+            No complaints yet. <a th:href="@{/customer/complaints/new}">Submit your first one</a>.
+          </div>
+          <div class="table-wrap" th:unless="${#lists.isEmpty(complaints)}">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th><th>Title</th><th>Category</th>
+                  <th>Priority</th><th>Status</th><th>Date</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="c : ${complaints}">
+                  <td th:text="${c.id}"></td>
+                  <td th:text="${c.title}"></td>
+                  <td th:text="${c.categoryName}"></td>
+                  <td><span th:replace="~{fragments/layout :: priorityBadge(${c.priority})}"></span></td>
+                  <td><span th:replace="~{fragments/layout :: statusBadge(${c.status})}"></span></td>
+                  <td th:text="${#temporals.format(c.createdAt,'dd MMM yyyy')}"></td>
+                  <td><a th:href="@{/customer/complaints/{id}(id=${c.id})}" class="btn btn-sm btn-outline">View</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

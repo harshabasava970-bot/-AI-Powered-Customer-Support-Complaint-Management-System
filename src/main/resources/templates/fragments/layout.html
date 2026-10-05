@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- ════════════════════════════════════════════════════════════════
+     FRAGMENT: sidebar
+     params: activeMenu (String)
+     ═══════════════════════════════════════════════════════════════ -->
+<aside th:fragment="sidebar(activeMenu)" id="sidebar" class="sidebar">
+  <div class="sidebar-brand">
+    <div style="font-size:1.2rem">🎧</div>
+    <div>SupportPortal <span>AI</span></div>
+  </div>
+
+  <!-- ADMIN -->
+  <div sec:authorize="hasRole('ADMIN')">
+    <div class="sidebar-section">Admin</div>
+    <ul class="sidebar-nav">
+      <li><a th:href="@{/admin/dashboard}"   th:classappend="${activeMenu=='dashboard'   ? 'active' : ''}"><span class="icon">📊</span> Dashboard</a></li>
+      <li><a th:href="@{/admin/complaints}"  th:classappend="${activeMenu=='complaints'  ? 'active' : ''}"><span class="icon">📋</span> All Complaints</a></li>
+      <li><a th:href="@{/admin/agents}"      th:classappend="${activeMenu=='agents'      ? 'active' : ''}"><span class="icon">👥</span> Agents</a></li>
+      <li><a th:href="@{/admin/users}"       th:classappend="${activeMenu=='users'       ? 'active' : ''}"><span class="icon">🧑‍💼</span> Users</a></li>
+      <li><a th:href="@{/admin/categories}"  th:classappend="${activeMenu=='categories'  ? 'active' : ''}"><span class="icon">🏷️</span> Categories</a></li>
+      <li><a th:href="@{/admin/analytics}"   th:classappend="${activeMenu=='analytics'   ? 'active' : ''}"><span class="icon">📈</span> Analytics</a></li>
+    </ul>
+  </div>
+
+  <!-- AGENT -->
+  <div sec:authorize="hasRole('AGENT')">
+    <div class="sidebar-section">Agent</div>
+    <ul class="sidebar-nav">
+      <li><a th:href="@{/agent/dashboard}"  th:classappend="${activeMenu=='dashboard'  ? 'active' : ''}"><span class="icon">🏠</span> Dashboard</a></li>
+      <li><a th:href="@{/agent/complaints}" th:classappend="${activeMenu=='complaints' ? 'active' : ''}"><span class="icon">📋</span> My Complaints</a></li>
+    </ul>
+  </div>
+
+  <!-- CUSTOMER -->
+  <div sec:authorize="hasRole('CUSTOMER')">
+    <div class="sidebar-section">Customer</div>
+    <ul class="sidebar-nav">
+      <li><a th:href="@{/customer/dashboard}"       th:classappend="${activeMenu=='dashboard'  ? 'active' : ''}"><span class="icon">🏠</span> Dashboard</a></li>
+      <li><a th:href="@{/customer/complaints}"      th:classappend="${activeMenu=='complaints' ? 'active' : ''}"><span class="icon">📋</span> My Complaints</a></li>
+      <li><a th:href="@{/customer/complaints/new}"  th:classappend="${activeMenu=='new'        ? 'active' : ''}"><span class="icon">➕</span> New Complaint</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <a th:href="@{/logout}">🚪 Logout</a>
+  </div>
+</aside>
+
+<!-- ════════════════════════════════════════════════════════════════
+     FRAGMENT: topbar
+     params: pageTitle (String)
+     ═══════════════════════════════════════════════════════════════ -->
+<header th:fragment="topbar(pageTitle)" class="topbar">
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <button id="sidebar-toggle" style="background:none;border:none;cursor:pointer;font-size:1.2rem;display:none">☰</button>
+    <span class="topbar-title" th:text="${pageTitle}">Page</span>
+  </div>
+  <div class="topbar-right">
+    <div class="user-badge">
+      <div class="avatar"
+           th:text="${#authentication.name != null ? #authentication.name.substring(0,1).toUpperCase() : 'U'}">U</div>
+      <span sec:authentication="name">User</span>
+    </div>
+    <a th:href="@{/logout}" class="btn btn-sm btn-outline">Logout</a>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════════
+     FRAGMENT: alerts
+     ═══════════════════════════════════════════════════════════════ -->
+<div th:fragment="alerts">
+  <div th:if="${successMessage}" class="alert alert-success" data-auto-dismiss>
+    ✅ <span th:text="${successMessage}"></span>
+  </div>
+  <div th:if="${errorMessage}" class="alert alert-danger" data-auto-dismiss>
+    ❌ <span th:text="${errorMessage}"></span>
+  </div>
+  <div th:if="${infoMessage}" class="alert alert-info" data-auto-dismiss>
+    ℹ️ <span th:text="${infoMessage}"></span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     FRAGMENT: statusBadge
+     params: status (String)
+     ═══════════════════════════════════════════════════════════════ -->
+<span th:fragment="statusBadge(status)"
+      th:classappend="'badge badge-' + ${status != null ? status.toString().toLowerCase().replace('_',''): 'new'}"
+      th:text="${status}">NEW</span>
+
+<!-- ════════════════════════════════════════════════════════════════
+     FRAGMENT: priorityBadge
+     params: priority (String)
+     ═══════════════════════════════════════════════════════════════ -->
+<span th:fragment="priorityBadge(priority)"
+      th:classappend="'badge badge-' + ${priority != null ? priority.toString().toLowerCase() : 'medium'}"
+      th:text="${priority}">MEDIUM</span>
+
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Error — SupportPortal</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="public-wrapper">
+  <div class="auth-card" style="text-align:center">
+    <div style="font-size:4rem;margin-bottom:1rem" th:text="${errorCode == '404' ? '🔍' : errorCode == '403' ? '🔒' : '⚠️'}">⚠️</div>
+    <h1 style="font-size:3rem;color:#64748b" th:text="${errorCode}">Error</h1>
+    <p style="margin:.75rem 0 1.5rem" th:text="${errorMessage}">An error occurred.</p>
+    <div style="display:flex;gap:.75rem;justify-content:center">
+      <a href="javascript:history.back()" class="btn btn-secondary">← Go Back</a>
+      <a th:href="@{/}" class="btn btn-primary">Home</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
