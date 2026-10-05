@@ -7,11 +7,11 @@ services:
     dockerfilePath: ./Dockerfile
     envVars:
       - key: DB_URL
-        value: jdbc:mysql://mysql-3bfe215c-harshabasava970-2b90.b.aivencloud.com:14858/defaultdb?useSSL=true&requireSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC
+        value: jdbc:mysql://mysql-3bfe215c-harshabasava970-2b90.b.aivencloud.com:14858/defaultdb?useSSL=true&requireSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&connectTimeout=30000&socketTimeout=60000
       - key: DB_USERNAME
         value: avnadmin
       - key: DB_PASSWORD
-        sync: false   # set manually in Render dashboard
+        sync: false
       - key: PORT
         value: "8080"
     healthCheckPath: /login
