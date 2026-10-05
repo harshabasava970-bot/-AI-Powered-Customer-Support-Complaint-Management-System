@@ -7,7 +7,7 @@ services:
     dockerfilePath: ./Dockerfile
     envVars:
       - key: DB_URL
-        value: jdbc:mysql://mysql-3bfe215c-harshabasava970-2b90.b.aivencloud.com:14858/defaultdb?useSSL=true&requireSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&connectTimeout=30000&socketTimeout=60000
+        value: jdbc:mysql://mysql-3bfe215c-harshabasava970-2b90.b.aivencloud.com:14858/defaultdb?sslMode=REQUIRED&allowPublicKeyRetrieval=true&serverTimezone=UTC&connectTimeout=60000&socketTimeout=60000
       - key: DB_USERNAME
         value: avnadmin
       - key: DB_PASSWORD
